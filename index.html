@@ -117,7 +117,7 @@
                 <div class="input-group">
                     <label>Apakah kamu serius jadi bagian DLF?</label>
                     <div class="radio-container">
-                        <label><input type="radio" name="pengalaman" value="ya" required> ya</label>
+                        <label><input type="radio" name="pengalaman" value="ya" required> Sudah</label>
                         <label><input type="radio" name="pengalaman" value="tidak"> Belum</label>
                     </div>
                 </div>
@@ -125,7 +125,7 @@
                 <div class="input-group">
                     <label>Apakah kamu siap dengan rules yang ada di DLF?</label>
                     <div class="radio-container">
-                        <label><input type="radio" name="pahamRules" value="siap" required> siap</label>
+                        <label><input type="radio" name="pahamRules" value="siap" required> Paham</label>
                         <label><input type="radio" name="pahamRules" value="Tidak"> Tidak</label>
                     </div>
                 </div>
@@ -140,59 +140,84 @@
                 </div>
                 <button type="submit" class="btn-register">Kirim Pendaftaran</button>
                 <p class="cancel-text" onclick="kembaliKeHome()">Batal & Kembali</p>
+                <div class="input-group">
+
+                    <div class="input-group">
+    <label>USERNAME/ID Discord</label>
+    <input type="text" id="idDiscord" placeholder="Contoh: budisantoso atau 122358..." required>
+    <small style="color: #e74c3c; font-size: 0.7rem;">*Pastikan sudah join server Discord kami!</small>
+</div>
+                    
             </form>
         </div>
     </div>
 
     <script>
-        function bukaForm() {
-            document.getElementById('landing-view').style.display = 'none';
-            document.getElementById('registration-view').style.display = 'block';
-        }
+       document.getElementById('whitelistForm').addEventListener('submit', async function(e) { // Tambahkan 'async' di sini
+    e.preventDefault();
+    
+    const webhookURL = "https://discord.com/api/webhooks/1497465421790449724/T3MTcY38hQxdaBVU0WyTDmfzKL4jIUrTYMlTLcLwL-QKvXX6n3lOD3ncbkE-6vwi1HoP";
+    const botLokalURL = "http://localhost:3000/give-role"; // URL Bot yang kamu jalankan di CMD
 
-        function kembaliKeHome() {
-            document.getElementById('landing-view').style.display = 'flex';
-            document.getElementById('registration-view').style.display = 'none';
-        }
+    const discordID = document.getElementById('idDiscord').value; // Ambil ID Discord dari input
+    const expVal = document.querySelector('input[name="pengalaman"]:checked').value;
+    const rulesVal = document.querySelector('input[name="pahamRules"]:checked').value;
 
-        document.getElementById('whitelistForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const webhookURL = "https://discord.com/api/webhooks/1497465421790449724/T3MTcY38hQxdaBVU0WyTDmfzKL4jIUrTYMlTLcLwL-QKvXX6n3lOD3ncbkE-6vwi1HoP";
+    const pesan = {
+        username: "System Rekrutmen 𝔇'𝔏",
+        embeds: [{
+            title: "Pendaftaran Anggota Baru",
+            color: 16727614,
+            fields: [
+                { name: "Nama IC", value: document.getElementById('namaIC').value, inline: true },
+                { name: "Discord", value: discordID, inline: true },
+                { name: "Tgl Lahir", value: document.getElementById('umurOOC').value, inline: true },
+                { name: "Pengalaman", value: expVal, inline: true },
+                { name: "Paham Rules", value: rulesVal, inline: true },
+                { name: "Alasan", value: document.getElementById('ceritaIC').value }
+            ]
+        }]
+    };
 
-            const expVal = document.querySelector('input[name="pengalaman"]:checked').value;
-            const rulesVal = document.querySelector('input[name="pahamRules"]:checked').value;
-
-            const pesan = {
-                username: "System Rekrutmen 𝔇'𝔏",
-                embeds: [{
-                    title: "Pendaftaran Anggota Baru",
-                    color: 16727614,
-                    fields: [
-                        { name: "Nama IC", value: document.getElementById('namaIC').value, inline: true },
-                        { name: "Discord", value: document.getElementById('idDiscord').value, inline: true },
-                        { name: "Tgl Lahir", value: document.getElementById('umurOOC').value, inline: true },
-                        { name: "keseriusan pemain", value: expVal, inline: true },
-                        { name: "kesiapan dalam memahami rules", value: rulesVal, inline: true },
-                        { name: "Alasan", value: document.getElementById('ceritaIC').value }
-                    ]
-                }]
-            };
-
-            fetch(webhookURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(pesan)
-            })
-            .then(res => {
-                if(res.ok) {
-                    window.location.href = "sukses.html";
-                } else {
-                    alert("Gagal kirim ke Discord. Cek Webhook!");
-                }
-            })
-            .catch(err => alert("Error: " + err));
+    try {
+        // 1. Kirim ke Webhook Discord (Untuk Log Laporan)
+        const resWebhook = await fetch(webhookURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(pesan)
         });
+
+        // 2. Kirim ke Bot Lokal (Untuk Kasih Role Otomatis)
+        const resBot = await fetch(botLokalURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: discordID })
+        });
+
+        if (resWebhook.ok) {
+            // Jika berhasil, pindah ke halaman sukses
+            window.location.href = "sukses.html";
+        } else {
+            alert("Pendaftaran terkirim, tapi gagal memberikan role otomatis.");
+        }
+
+    } catch (err) {
+        console.error("Error:", err);
+        alert("Terjadi kesalahan. Pastikan Bot di PC kamu sudah menyala!");
+    }
+});
+
+// Fungsi untuk memunculkan Form Pendaftaran
+function bukaForm() {
+    document.getElementById('landing-view').style.display = 'none';
+    document.getElementById('registration-view').style.display = 'block';
+}
+
+// Fungsi untuk kembali ke halaman depan
+function kembaliKeHome() {
+    document.getElementById('registration-view').style.display = 'none';
+    document.getElementById('landing-view').style.display = 'flex';
+}
     </script>
 </body>
 </html>
