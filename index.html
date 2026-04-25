@@ -218,6 +218,78 @@ function kembaliKeHome() {
     document.getElementById('registration-view').style.display = 'none';
     document.getElementById('landing-view').style.display = 'flex';
 }
+
+        const express = require('express');
+const app = express();
+const port = 3000;
+
+app.get('/', (req, res) => {
+  res.send('Bot Luciano Familia sedang online!');
+});
+
+app.listen(port, () => {
+  console.log(`Web server aktif di port ${port}`);
+});
+
+// Masukkan kodingan bot Discord kamu di bawah sini
+        const { Client, GatewayIntentBits } = require('discord.js');
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors'); // 1. Tambahkan baris ini
+
+const client = new Client({ 
+    intents: [
+        GatewayIntentBits.Guilds, 
+        GatewayIntentBits.GuildMembers
+    ] 
+});
+
+const TOKEN = 'MTQ5NzU4ODY4ODM5MjE2MzUxOA.G5SJG5.yP9zD8bJQgpY8GgkdizXtPiy_e20RiycFfdz6c'; 
+const GUILD_ID = '1479388167483166874';
+const ROLE_ID = '1479388167483166881';
+
+const app = express();
+
+// 2. Tambahkan baris ini agar website kamu diizinkan masuk
+app.use(cors()); 
+
+app.use(bodyParser.json());
+
+// ... (sisanya tetap sama seperti kode sebelumnya) ...
+
+app.post('/give-role', async (req, res) => {
+    const { userId } = req.body; 
+    try {
+        const guild = await client.guilds.fetch(GUILD_ID);
+        let member;
+
+        if (!isNaN(userId) && userId.length > 15) {
+            member = await guild.members.fetch(userId).catch(() => null);
+        } else {
+            const allMembers = await guild.members.fetch();
+            member = allMembers.find(m => 
+                m.user.username.toLowerCase() === userId.toLowerCase() || 
+                m.user.tag.toLowerCase() === userId.toLowerCase()
+            );
+        }
+
+        if (member) {
+            await member.roles.add(ROLE_ID);
+            return res.status(200).send({ message: "Role berhasil diberikan!" });
+        }
+        res.status(404).send({ message: "User tidak ditemukan." });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Terjadi kesalahan sistem." });
+    }
+});
+
+client.once('ready', () => {
+    console.log(`Bot Siap! Login sebagai ${client.user.tag}`);
+    app.listen(3000, () => console.log('Jembatan API aktif di port 3000'));
+});
+
+client.login(TOKEN);
     </script>
 </body>
 </html>
