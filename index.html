@@ -142,34 +142,32 @@
                 <p class="cancel-text" onclick="kembaliKeHome()">Batal & Kembali</p>
                 <div class="input-group">
 
-                    <div class="input-group">
-    <label>USERNAME/ID Discord</label>
-    <input type="text" id="idDiscord" placeholder="Contoh: budisantoso atau 122358..." required>
-    <small style="color: #e74c3c; font-size: 0.7rem;">*Pastikan sudah join server Discord kami!</small>
-</div>
-                    
-            </form>
+            
         </div>
     </div>
     <script>
+  
     document.getElementById('whitelistForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         // --- KONFIGURASI WEBHOOK ---
         const webhookURL = "https://discord.com/api/webhooks/1497465421790449724/T3MTcY38hQxdaBVU0WyTDmfzKL4jIUrTYMlTLcLwL-QKvXX6n3lOD3ncbkE-6vwi1HoP";
         
+        // Mengambil data dari input
         const discordUsername = document.getElementById('idDiscord').value;
         const namaIC = document.getElementById('namaIC').value;
-        const seriusVal = document.querySelector('input[name="seriusDLF"]:checked').value;
-        const siapRulesVal = document.querySelector('input[name="siapRules"]:checked').value;
         const tglLahir = document.getElementById('umurOOC').value;
         const alasan = document.getElementById('ceritaIC').value;
 
+        // Memperbaiki pemanggilan radio button agar sesuai dengan atribut "name" di HTML
+        const seriusVal = document.querySelector('input[name="pengalaman"]:checked').value;
+        const siapRulesVal = document.querySelector('input[name="pahamRules"]:checked').value;
+
         const pesan = {
-            username: "Lady Gangster Recruiter 𝔇'𝔏",
+            username: "Boy Gangster Recruitment", // Sudah diperbaiki tanda kutipnya
             embeds: [{
-                title: "Pendaftaran Lady Gangster Baru",
-                color: 10181046,
+                title: "Pendaftaran Anggota Baru - Boy Division",
+                color: 15158332, // Warna merah sesuai tema DLF
                 fields: [
                     { name: "Nama IC", value: namaIC, inline: true },
                     { name: "Username Discord", value: discordUsername, inline: true },
@@ -178,22 +176,25 @@
                     { name: "Tgl Lahir IC", value: tglLahir, inline: true },
                     { name: "Alasan", value: alasan }
                 ],
-                footer: { text: "𝔇 ' 𝔏𝔲𝔠𝔦𝔞𝔫𝔬 𝔉𝔞milia - Women Division" }
+                footer: { text: "𝔇 ' 𝔏𝔲𝔠𝔦𝔞𝔫𝔬 𝔉𝔞milia - Boy Division" }
             }]
         };
 
         try {
-            // Hanya kirim ke Webhook Discord
-            await fetch(webhookURL, { 
+            const response = await fetch(webhookURL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' }, 
                 body: JSON.stringify(pesan) 
             });
 
-            // Langsung pindah ke halaman sukses
-            window.location.href = "sukses.html";
+            if (response.ok) {
+                window.location.href = "sukses.html";
+            } else {
+                alert("Gagal mengirim ke Discord. Status: " + response.status);
+            }
         } catch (err) {
-            alert("Gagal mengirim pendaftaran ke Discord. Cek koneksi internet!");
+            console.error(err);
+            alert("Gagal mengirim pendaftaran. Cek koneksi internet!");
         }
     });
 
@@ -205,6 +206,7 @@
         document.getElementById('registration-view').style.display = 'none';
         document.getElementById('landing-view').style.display = 'flex';
     }
+
 </script>
 
     
