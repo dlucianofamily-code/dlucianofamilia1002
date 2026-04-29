@@ -151,89 +151,63 @@
             </form>
         </div>
     </div>
-
     <script>
-       document.getElementById('whitelistForm').addEventListener('submit', async function(e) { // Tambahkan 'async' di sini
-    e.preventDefault();
-    
-    const webhookURL = "https://discord.com/api/webhooks/1497465421790449724/T3MTcY38hQxdaBVU0WyTDmfzKL4jIUrTYMlTLcLwL-QKvXX6n3lOD3ncbkE-6vwi1HoP";
-    const botLokalURL = "http://localhost:3000/give-role"; // URL Bot yang kamu jalankan di CMD
+    document.getElementById('whitelistForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // --- KONFIGURASI WEBHOOK ---
+        const webhookURL = "https://discord.com/api/webhooks/1497465421790449724/T3MTcY38hQxdaBVU0WyTDmfzKL4jIUrTYMlTLcLwL-QKvXX6n3lOD3ncbkE-6vwi1HoP";
+        
+        const discordUsername = document.getElementById('idDiscord').value;
+        const namaIC = document.getElementById('namaIC').value;
+        const seriusVal = document.querySelector('input[name="seriusDLF"]:checked').value;
+        const siapRulesVal = document.querySelector('input[name="siapRules"]:checked').value;
+        const tglLahir = document.getElementById('umurOOC').value;
+        const alasan = document.getElementById('ceritaIC').value;
 
-    const discordID = document.getElementById('idDiscord').value; // Ambil ID Discord dari input
-    const expVal = document.querySelector('input[name="pengalaman"]:checked').value;
-    const rulesVal = document.querySelector('input[name="pahamRules"]:checked').value;
+        const pesan = {
+            username: "Lady Gangster Recruiter 𝔇'𝔏",
+            embeds: [{
+                title: "Pendaftaran Lady Gangster Baru",
+                color: 10181046,
+                fields: [
+                    { name: "Nama IC", value: namaIC, inline: true },
+                    { name: "Username Discord", value: discordUsername, inline: true },
+                    { name: "Serius?", value: seriusVal, inline: true },
+                    { name: "Siap Rules?", value: siapRulesVal, inline: true },
+                    { name: "Tgl Lahir IC", value: tglLahir, inline: true },
+                    { name: "Alasan", value: alasan }
+                ],
+                footer: { text: "𝔇 ' 𝔏𝔲𝔠𝔦𝔞𝔫𝔬 𝔉𝔞milia - Women Division" }
+            }]
+        };
 
-    const pesan = {
-        username: "System Rekrutmen 𝔇'𝔏",
-        embeds: [{
-            title: "Pendaftaran Anggota Baru",
-            color: 16727614,
-            fields: [
-                { name: "Nama IC", value: document.getElementById('namaIC').value, inline: true },
-                { name: "Discord", value: discordID, inline: true },
-                { name: "Tgl Lahir", value: document.getElementById('umurOOC').value, inline: true },
-                { name: "keseriusan pemain", value: expVal, inline: true },
-                { name: "Paham Rules", value: rulesVal, inline: true },
-                { name: "Alasan", value: document.getElementById('ceritaIC').value }
-            ]
-        }]
-    };
+        try {
+            // Hanya kirim ke Webhook Discord
+            await fetch(webhookURL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(pesan) 
+            });
 
-    try {
-        // 1. Kirim ke Webhook Discord (Untuk Log Laporan)
-        const resWebhook = await fetch(webhookURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(pesan)
-        });
-
-        // 2. Kirim ke Bot Lokal (Untuk Kasih Role Otomatis)
-        const resBot = await fetch(botLokalURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: discordID })
-        });
-
-        if (resWebhook.ok) {
-            // Jika berhasil, pindah ke halaman sukses
+            // Langsung pindah ke halaman sukses
             window.location.href = "sukses.html";
-        } else {
-            alert("Pendaftaran terkirim, tapi gagal memberikan role otomatis.");
+        } catch (err) {
+            alert("Gagal mengirim pendaftaran ke Discord. Cek koneksi internet!");
         }
+    });
 
-    } catch (err) {
-        console.error("Error:", err);
-        alert("Terjadi kesalahan. Pastikan Bot di PC kamu sudah menyala!");
+    function bukaForm() {
+        document.getElementById('landing-view').style.display = 'none';
+        document.getElementById('registration-view').style.display = 'block';
     }
-});
+    function kembaliKeHome() {
+        document.getElementById('registration-view').style.display = 'none';
+        document.getElementById('landing-view').style.display = 'flex';
+    }
+</script>
 
-// Fungsi untuk memunculkan Form Pendaftaran
-function bukaForm() {
-    document.getElementById('landing-view').style.display = 'none';
-    document.getElementById('registration-view').style.display = 'block';
-}
+    
 
-// Fungsi untuk kembali ke halaman depan
-function kembaliKeHome() {
-    document.getElementById('registration-view').style.display = 'none';
-    document.getElementById('landing-view').style.display = 'flex';
-}
-
-        const express = require('express');
-const app = express();
-const port = 3000;
-
-app.get('/', (req, res) => {
-  res.send('Bot Luciano Familia sedang online!');
-});
-
-app.listen(port, () => {
-  console.log(`Web server aktif di port ${port}`);
-});
-
-// Masukkan kodingan bot Discord kamu di bawah sini
-      
-
-    </script>
 </body>
 </html>
